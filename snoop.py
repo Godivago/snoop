@@ -81,13 +81,13 @@ _____/ _|  _|\\___/ \\___/  .__/
 
 ## Создание директорий результатов.
 def mkdir_path():
-    try:
-        if not WINDOWS and "build" in VERSION:
-            replace_snoop_dir = os.path.join(os.environ["HOME"], 'snoop')
-            if os.path.exists(replace_snoop_dir):
-                shutil.move(replace_snoop_dir, os.path.join(os.environ["HOME"], '.snoop'))
-    except Exception:
-        pass
+    # try:
+    #     if not WINDOWS and "build" in VERSION:
+    #         replace_snoop_dir = os.path.join(os.environ["HOME"], 'snoop')
+    #         if os.path.exists(replace_snoop_dir):
+    #             shutil.move(replace_snoop_dir, os.path.join(os.environ["HOME"], '.snoop'))
+    # except Exception:
+    #     pass
 
     dirhome = os.path.join(os.environ["LOCALAPPDATA" if WINDOWS else "HOME"], "snoop" if WINDOWS else '.snoop')
 
