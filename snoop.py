@@ -123,9 +123,9 @@ WINDOWS = True if sys.platform == 'win32' else False
 LINUX = True if ANDROID is False and WINDOWS is False else False
 MACOS = True if platform.system() == "Darwin" else False #поддержка macOS (экспериментальная).
 
-E_MAIL = 'demo: snoopproject@protonmail.com'
+E_MAIL = 'snoopproject@protonmail.com'
 END_OF_LICENSE = (2027, 1, 1, 3, 0, 0, 0, 0, 0) #формат даты согласно международному стандарту ISO 8601: год-месяц-день.
-VERSION = version_snoop('v1.4.3', "s", "d")
+VERSION = version_snoop('v1.4.3', "s", "f")
 DIRPATH = mkdir_path()
 TIME_START = time.time()
 TIME_DATE = time.localtime()
@@ -644,6 +644,7 @@ def snoop(username, BDdemo_new, verbose=False, norm=False, reports=False, user=F
                 results_site["exists"] = "gray_list"
         else:
 # URL пользователя на сайте (если он существует).
+            if "url" not in param_websites: continue
             url = param_websites["url"].format(username)
             results_site["url_user"] = url
             url_API = param_websites.get("urlProbe")
@@ -1063,7 +1064,11 @@ def autoclean():
 def license_snoop():
     with open('COPYRIGHT', 'r', encoding="utf8") as copyright:
         wl = 5 if WINDOWS and int(platform.win32_ver()[0]) < 10 else 4
-        cop = copyright.read().replace('=' * 80, "~" * (os.get_terminal_size()[0] - wl)).strip()
+        try:
+            tw = os.get_terminal_size()[0]
+        except OSError:
+            tw = 80
+        cop = copyright.read().replace('=' * 80, "~" * (tw - wl)).strip()
         console.print(Panel(cop, title='[bold white]COPYRIGHT[/bold white]',
                             style=STL(color="white", bgcolor="blue"),
                             border_style=STL(color="white", bgcolor="blue")))
@@ -1146,6 +1151,12 @@ def license_snoop():
 
 
 ## ОСНОВА.
+def premium():
+    pass
+
+def meta(cert=False):
+    pass
+
 def main_cli():
     if not WINDOWS and not MACOS:
         set_start_method('fork')
@@ -1153,8 +1164,8 @@ def main_cli():
         premium()
     web_path_copy()
     date_off = license()
-    BDdemo = snoopbanner.DB('BDdemo')
-    BDflag = snoopbanner.DB('BDflag')
+    BDdemo = snoopbanner.DB('BDfull_new')
+    BDflag = BDdemo
     flagBS = len(BDdemo)
     web_sites = f"{len(BDflag) // 100}00+"
 
@@ -1206,7 +1217,7 @@ def main_cli():
                               help="\033[36mН\033[0mикнейм разыскиваемого пользователя. \
                                     Поддерживается поиск одновременно нескольких имен.\
                                     Ник, содержащий в своем имени пробел, заключается в кавычки.")
-    search_group.add_argument("--base", "-b <file>", dest="json_file", default="BDdemo", metavar='',
+    search_group.add_argument("--base", "-b <file>", dest="json_file", default="BDfull_new", metavar='',
                               help=argparse.SUPPRESS if "demo" in VERSION else "\033[36mУ\033[0mказать для поиска 'nickname' \
                                                                                 другую БД (Локально).")
     search_group.add_argument("--web-base", "-w", action="store_true", dest="web", default=False,
@@ -1506,13 +1517,8 @@ def main_cli():
 # Запуск функции '--list-all'.
         while True:
             sortY = console.input("[cyan]Выберите действие: [/cyan]")
-            if sortY == "1" or sortY == "2":
-                sort_list_all(BDflag, Fore.GREEN, "full version", line=True)
-                sort_list_all(BDdemo, Fore.RED, "demo version")
-                break
-            elif sortY == "3":
-                sort_list_all(BDdemo, Fore.RED, "demo version", line=True)
-                sort_list_all(BDflag, Fore.GREEN, "full version")
+            if sortY in ["1", "2", "3"]:
+                sort_list_all(BDdemo, Fore.GREEN, "full version", line=True)
                 break
 # Действие не выбрано '--list-all'.
             else:
@@ -1646,10 +1652,7 @@ def main_cli():
 
 ## Опция '-w'.
     if args.web:
-        print("")
-        snoopbanner.logo("Функция '-w' доступна только пользователям Snoop full version...",
-                         color="\033[37m\033[44m", exit=False)
-        snoopbanner.donate()
+        pass
 
 
 ## Опция '-b'. Проверить, существует ли альтернативная база данных, иначе default.
@@ -1692,7 +1695,7 @@ def main_cli():
 ## Если опции '-sei' не указаны, то используем БД, как есть.
     BDdemo_new = {}
     if args.site_list is None and args.exclude_country is None and args.one_level is None:
-        BDdemo_new = BDdemo if len(BDdemo) < 404 else sys.exit()
+        BDdemo_new = BDdemo
 
 
 ## Опция '-s'.
@@ -1857,11 +1860,11 @@ def main_cli():
 
             file_txt.write("\n" f"Запрашиваемый объект: <{nick}> найден: {exists_counter} раз(а).")
             file_txt.write("\n" f"Сессия: {str(round(timefinish))}сек {str(sess_size)}MB.")
-            file_txt.write("\n" f"База Snoop (demo version): {flagBS} Websites.")
+            file_txt.write("\n" f"База Snoop (full version): {flagBS} Websites.")
             file_txt.write("\n" f"Исключённые регионы: {exl}.")
             file_txt.write("\n" f"Выбор конкретных регионов: {one}.")
             file_txt.write("\n" f"Обновлено: {time.strftime('%Y-%m-%d_%H:%M:%S', TIME_DATE)}.\n")
-            file_txt.write("\n" f"©2020-{time.localtime().tm_year} «Snoop Project» (demo version).")
+            file_txt.write("\n" f"©2020-{time.localtime().tm_year} «Snoop Project» (full version).")
             file_txt.close()
 
 
@@ -1879,7 +1882,7 @@ def main_cli():
                             "</style>\n<link rel='stylesheet' href='../../../web/style.css'>\n</head>\n\n<body id='snoop'>\n\n" + \
                             "<div id='particles-js'></div>\n\n" + \
                             "<h1><a class='GL' href='file://" + f"{path_}/results/nicknames/html/'>open file</a>" + "</h1>\n")
-            file_html.write("<h3>Snoop Project (demo version)</h3>\n<p>Нажмите: 'сортировать по странам', возврат:" + \
+            file_html.write("<h3>Snoop Project (full version)</h3>\n<p>Нажмите: 'сортировать по странам', возврат:" + \
                             "'<span style='text-shadow: 0px 0px 13px #40E0D0'>F5'</span></p>\n<div id='report'>\n" + \
                             "<button onclick='sortList()'>Сортировать по странам ↓↑</button><br>\n<ol" + " id='id777'>\n")
 
@@ -1906,7 +1909,7 @@ def main_cli():
             file_html.write("<br> Сессия: " + "<b>" + str(round(timefinish)) + "сек_" + str(sess_size) + "MB</b>.\n")
             file_html.write("<br> Исключённые регионы: <b>" + str(exl) + "</b>.\n")
             file_html.write("<br> Выбор конкретных регионов: <b>" + str(one) + "</b>.\n")
-            file_html.write("<br> База Snoop (demo version): <b>" + str(flagBS) + "</b>" + " Websites.\n")
+            file_html.write("<br> База Snoop (full version): <b>" + str(flagBS) + "</b>" + " Websites.\n")
             file_html.write("<br> Обновлено: " + "<i><b>" + time.strftime("%Y-%m-%d</b>_%H:%M:%S", TIME_DATE) + \
                             ".</i><br><br>\n</div>\n")
             file_html.write("""
@@ -2061,7 +2064,7 @@ document.getElementById('snoop').innerHTML=""
                                  Ssession])
 
             writer.writerow(['«' + '-'*35, '-'*4, '-'*35, '-'*56, '-'*13, '-'*17, '-'*37, '-'*17, '-'*28, '-'*15 + '»'])
-            writer.writerow([f'БД_(demoversion)={flagBS}_Websites'])
+            writer.writerow([f'БД_(fullversion)={flagBS}_Websites'])
             writer.writerow([f"Nick={usernamCSV}"])
             writer.writerow('')
             writer.writerow([f'Исключённые_регионы={exl}'])
@@ -2070,7 +2073,7 @@ document.getElementById('snoop').innerHTML=""
             writer.writerow('')
             writer.writerow(['Дата'])
             writer.writerow([time.strftime("%Y-%m-%d_%H:%M:%S", TIME_DATE)])
-            writer.writerow([f'©2020-{time.localtime().tm_year} «Snoop Project»\n(demo version).'])
+            writer.writerow([f'©2020-{time.localtime().tm_year} «Snoop Project»\n(full version).'])
 
             file_csv.close()
 
